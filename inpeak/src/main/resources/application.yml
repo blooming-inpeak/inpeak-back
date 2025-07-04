@@ -51,11 +51,6 @@ spring:
     init:
       mode: always
 
-  data:
-    redis:
-      host: ${SPRING_REDIS_HOST:redis}
-      port: 6379
-
 ---
 spring:
   config:
@@ -81,11 +76,6 @@ spring:
     console:
       enabled: true
 
-  data:
-    redis:
-      host: localhost
-      port: 6379
-
 ---
 spring:
   config:
@@ -106,8 +96,3 @@ spring:
     properties:
       hibernate:
         format_sql: false
-
-  data:
-    redis:
-      host: ${REDIS_HOST}
-      port: ${REDIS_PORT}
