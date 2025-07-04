@@ -6,16 +6,16 @@ build/
 !**/src/test/**/build/
 
 ### Q Class ###
-src/main/generated
+**/src/main/generated
 
 ### OAuth ###
-src/main/resources/application-oauth.yml
+**/src/main/resources/application-oauth.yml
 
 ### AWS ###
-src/main/resources/application-aws.yml
+**/src/main/resources/application-aws.yml
 
 ### OpenAI ###
-src/main/resources/application-openai.yml
+**/src/main/resources/application-openai.yml
 
 ### STS ###
 .apt_generated
