@@ -7,6 +7,7 @@ import com.blooming.inpeak.answer.dto.command.AnswerFilterCommand;
 import com.blooming.inpeak.answer.dto.response.AnswerDetailResponse;
 import com.blooming.inpeak.answer.dto.response.AnswerIDResponse;
 import com.blooming.inpeak.answer.dto.response.AnswerListResponse;
+import com.blooming.inpeak.answer.dto.response.AnswerPresignedUrlResponse;
 import com.blooming.inpeak.answer.dto.response.AnswerResponse;
 import com.blooming.inpeak.answer.dto.response.InterviewWithAnswersResponse;
 import com.blooming.inpeak.answer.dto.response.RecentAnswerListResponse;
@@ -45,6 +46,7 @@ public class AnswerService {
     private final QuestionRepository questionRepository;
     private final InterviewRepository interviewRepository;
     private final MemberStatisticsService memberStatisticsService;
+    private final AnswerPresignedUrlService answerPresignedUrlService;
 
     /**
      * 답변을 스킵하는 메서드
@@ -231,5 +233,27 @@ public class AnswerService {
         }
 
         return AnswerDetailResponse.from(answer);
+    }
+
+    /**
+     * 답변에 대한 presigned URL을 생성하는 메서드
+     *
+     * @param memberId    사용자 ID
+     * @param startDate   시작 날짜
+     * @param extension   비디오 확장자
+     * @param includeVideo 비디오 포함 여부
+     * @return presigned URL 응답 객체
+     */
+    public AnswerPresignedUrlResponse getPresignedUrl(Long memberId, LocalDate startDate,
+        String extension, Boolean includeVideo) {
+        String audioURL = answerPresignedUrlService.getPreSignedUrl(memberId, startDate, "wav",
+            "audio");
+        String videoURL = null;
+
+        if (includeVideo) {
+            videoURL = answerPresignedUrlService.getPreSignedUrl(memberId, startDate, extension,
+                "video");
+        }
+        return new AnswerPresignedUrlResponse(audioURL, videoURL);
     }
 }

@@ -88,10 +88,11 @@ public class AnswerController {
     public ResponseEntity<AnswerPresignedUrlResponse> getPresignedUrl(
         @AuthenticationPrincipal MemberPrincipal memberPrincipal,
         @RequestParam LocalDate startDate,
-        @RequestParam String extension
+        @RequestParam(required = false) String extension,
+        @RequestParam Boolean includeVideo
     ) {
-        return ResponseEntity.ok(
-            answerPresignedUrlService.getPreSignedUrl(memberPrincipal.id(), startDate, extension));
+        return ResponseEntity.ok(answerService.getPresignedUrl(
+            memberPrincipal.id(), startDate, extension, includeVideo));
     }
 
     @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
