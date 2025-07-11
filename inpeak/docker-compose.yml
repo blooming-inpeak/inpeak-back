@@ -8,14 +8,11 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
-      redis:
-        condition: service_started
     environment:
       - SPRING_PROFILES_ACTIVE=local
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/inpeak-db
       - SPRING_DATASOURCE_USERNAME=myuser
       - SPRING_DATASOURCE_PASSWORD=secret
-      - SPRING_REDIS_HOST=redis
       - SECRET_KEY=your-secret-key-should-be-at-least-32-characters-long
       - REDIRECT_URL=http://localhost:5173
     networks:
@@ -44,13 +41,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
-
-  redis:
-    image: redis:7.2
-    ports:
-      - "16379:6379"
-    networks:
-      - inpeak-net
 
 networks:
   inpeak-net:
