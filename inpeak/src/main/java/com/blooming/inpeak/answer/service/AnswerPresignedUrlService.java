@@ -1,15 +1,19 @@
 package com.blooming.inpeak.answer.service;
 
 import com.blooming.inpeak.common.error.exception.BadRequestException;
+import com.blooming.inpeak.common.error.exception.DownloadFailureException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
@@ -24,6 +28,8 @@ public class AnswerPresignedUrlService {
     private String bucket;
 
     private final S3Presigner s3Presigner;
+    @Qualifier("whisperRestTemplate")
+    private final RestTemplate whisperRestTemplate;
 
     private static final Map<String, String> EXT_TO_CONTENT_TYPE = Map.of(
         "webm", "video/webm",
@@ -96,5 +102,21 @@ public class AnswerPresignedUrlService {
         }
 
         return EXT_TO_CONTENT_TYPE.getOrDefault(lowerExt, "application/octet-stream");
+    }
+
+    /**
+     * S3에서 Presigned URL을 통해 오디오 파일을 다운로드합니다.
+     *
+     * @param presignedUrl Presigned URL
+     * @return 오디오 파일의 바이트 배열
+     */
+    public byte[] downloadAudioFromS3(String presignedUrl) {
+        ResponseEntity<byte[]> response = whisperRestTemplate.getForEntity(presignedUrl, byte[].class);
+
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            throw new DownloadFailureException("S3 Presigned URL 다운로드 실패: " + presignedUrl);
+        }
+
+        return response.getBody();
     }
 }

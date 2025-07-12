@@ -1,8 +1,10 @@
 package com.blooming.inpeak.answer.controller;
 
 import com.blooming.inpeak.answer.domain.AnswerStatus;
+import com.blooming.inpeak.answer.dto.command.AnswerCreateAsyncCommand;
 import com.blooming.inpeak.answer.dto.command.AnswerCreateCommand;
 import com.blooming.inpeak.answer.dto.command.AnswerFilterCommand;
+import com.blooming.inpeak.answer.dto.request.AnswerCreateRequest;
 import com.blooming.inpeak.answer.dto.request.AnswerSkipRequest;
 import com.blooming.inpeak.answer.dto.request.CommentUpdateRequest;
 import com.blooming.inpeak.answer.dto.request.CorrectAnswerFilterRequest;
@@ -14,6 +16,7 @@ import com.blooming.inpeak.answer.dto.response.AnswerListResponse;
 import com.blooming.inpeak.answer.dto.response.AnswerPresignedUrlResponse;
 import com.blooming.inpeak.answer.dto.response.InterviewWithAnswersResponse;
 import com.blooming.inpeak.answer.dto.response.RecentAnswerListResponse;
+import com.blooming.inpeak.answer.service.AnswerAsyncService;
 import com.blooming.inpeak.answer.service.AnswerPresignedUrlService;
 import com.blooming.inpeak.answer.service.AnswerService;
 import com.blooming.inpeak.member.dto.MemberPrincipal;
@@ -39,6 +42,7 @@ public class AnswerController {
 
     private final AnswerService answerService;
     private final AnswerPresignedUrlService answerPresignedUrlService;
+    private final AnswerAsyncService answerAsyncService;
 
     @PostMapping("/skip")
     public ResponseEntity<AnswerIDResponse> skipAnswer(
@@ -107,6 +111,17 @@ public class AnswerController {
         AnswerIDResponse response = answerService.createAnswer(
             AnswerCreateCommand.of(audioFile, time, memberPrincipal.id(),
                 questionId, interviewId, videoURL));
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/v2/create")
+    public ResponseEntity<Long> createAnswer(
+        @AuthenticationPrincipal MemberPrincipal memberPrincipal,
+        @RequestBody AnswerCreateRequest request
+    ) {
+        AnswerCreateAsyncCommand command = request.toAsyncCommand(memberPrincipal.id());
+        Long response = answerAsyncService.requestAsyncAnswerCreation(command);
 
         return ResponseEntity.ok(response);
     }
