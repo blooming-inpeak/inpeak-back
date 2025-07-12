@@ -1,5 +1,6 @@
 package com.blooming.inpeak.answer.domain;
 
+import com.blooming.inpeak.answer.dto.command.AnswerCreateAsyncCommand;
 import com.blooming.inpeak.answer.dto.command.AnswerCreateCommand;
 import com.blooming.inpeak.common.base.BaseEntity;
 import com.blooming.inpeak.interview.domain.Interview;
@@ -111,6 +112,27 @@ public class Answer extends BaseEntity {
      * @return Answer 객체
      */
     public static Answer of(AnswerCreateCommand command, String feedback) {
+        String[] texts = splitAndTrimText(feedback);
+
+        String userAnswer = texts[0];
+        AnswerStatus status = AnswerStatus.valueOf(texts[1]);
+        String AIAnswer = texts[2];
+        String trimmedVideoURL = removeQueryParams(command.videoURL());
+
+        return Answer.builder()
+            .questionId(command.questionId())
+            .memberId(command.memberId())
+            .interviewId(command.interviewId())
+            .userAnswer(userAnswer)
+            .videoURL(trimmedVideoURL)
+            .runningTime(command.time())
+            .isUnderstood(false)
+            .status(status)
+            .AIAnswer(AIAnswer)
+            .build();
+    }
+
+    public static Answer of(AnswerCreateAsyncCommand command, String feedback) {
         String[] texts = splitAndTrimText(feedback);
 
         String userAnswer = texts[0];

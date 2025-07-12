@@ -42,7 +42,7 @@ public class AnswerService {
 
     private final AnswerRepository answerRepository;
     private final AnswerRepositoryCustom answerRepositoryCustom;
-    private final GPTService gptService;
+    private final GptService gptService;
     private final QuestionRepository questionRepository;
     private final InterviewRepository interviewRepository;
     private final MemberStatisticsService memberStatisticsService;
@@ -144,7 +144,7 @@ public class AnswerService {
         Question question = questionRepository.findById(command.questionId())
             .orElseThrow(() -> new NotFoundException("해당 질문이 존재하지 않습니다."));
 
-        String feedback = gptService.makeGPTResponse(command.audioFile(), question.getContent());
+        String feedback = gptService.makeGptResponse(command.audioFile(), question.getContent());
 
         Answer answer = Answer.of(command, feedback);
         answerRepository.save(answer);
