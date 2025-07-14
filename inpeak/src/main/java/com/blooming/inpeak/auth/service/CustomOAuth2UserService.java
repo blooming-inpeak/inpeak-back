@@ -61,8 +61,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             .kakaoId(kakaoId)
             .nickname(uniqueNickname)
             .provider(OAuth2Provider.KAKAO)
-            .totalQuestionCount(0L)
-            .correctAnswerCount(0L)
             .registrationStatus(RegistrationStatus.INITIATED)
             .kakaoEmail(kakaoEmail)
             .build();

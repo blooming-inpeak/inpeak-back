@@ -30,8 +30,6 @@ CREATE TABLE members (
                          id BIGINT PRIMARY KEY AUTO_INCREMENT,
                          kakao_id BIGINT,
                          nickname VARCHAR(255) NOT NULL UNIQUE,
-                         total_question_count BIGINT,
-                         correct_answer_count BIGINT,
                          provider VARCHAR(50) NOT NULL,
                          registration_status VARCHAR(50) NOT NULL,
                          kakao_email VARCHAR(255) NOT NULL,

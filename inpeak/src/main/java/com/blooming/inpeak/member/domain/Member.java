@@ -30,12 +30,6 @@ public class Member extends BaseEntity {
     @Column(nullable = false, unique = true)
     private String nickname;
 
-    @Column
-    private Long totalQuestionCount;
-
-    @Column
-    private Long correctAnswerCount;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private OAuth2Provider provider;
@@ -48,32 +42,13 @@ public class Member extends BaseEntity {
     private String kakaoEmail;
 
     @Builder
-    private Member(
+    public Member(
         Long id,
-        Long kakaoId, String nickname, Long totalQuestionCount,
-        Long correctAnswerCount, OAuth2Provider provider,
+        Long kakaoId, String nickname, OAuth2Provider provider,
         RegistrationStatus registrationStatus, String kakaoEmail
     ) {
         this.id = id;
         this.kakaoId = kakaoId;
-        this.nickname = nickname;
-        this.totalQuestionCount = totalQuestionCount;
-        this.correctAnswerCount = correctAnswerCount;
-        this.provider = provider;
-        this.registrationStatus =
-            registrationStatus != null ? registrationStatus : RegistrationStatus.INITIATED;
-        this.kakaoEmail = kakaoEmail;
-    }
-
-    // 테스트 파일에서 사용할 생성자
-    @Builder(access = AccessLevel.PRIVATE)
-    public Member(
-        Long id, Long kakaoId, String nickname,
-        OAuth2Provider provider, RegistrationStatus registrationStatus,
-        String kakaoEmail
-    ) {
-        this.id = id;
-        this.kakaoId= kakaoId;
         this.nickname = nickname;
         this.provider = provider;
         this.registrationStatus =
