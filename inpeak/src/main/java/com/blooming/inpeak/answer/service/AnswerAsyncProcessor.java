@@ -8,6 +8,7 @@ import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -19,7 +20,8 @@ public class AnswerAsyncProcessor {
     private final AnswerPresignedUrlService answerPresignedUrlService;
 
     @Async("gptExecutor")
-    public CompletableFuture<Void> processAnswerTaskAsync(AnswerTask task) {
+    @Transactional
+    public CompletableFuture<AnswerTask> handleTaskAsync(AnswerTask task) {
         AnswerCreateAsyncCommand command = AnswerCreateAsyncCommand.from(task);
         byte[] audioBytes = answerPresignedUrlService.downloadAudioFromS3(command.audioURL());
 
@@ -30,10 +32,10 @@ public class AnswerAsyncProcessor {
 
         } catch (Exception e) {
             task.markFailed();
-        } finally {
-            answerTaskRepository.save(task);
         }
 
-        return CompletableFuture.completedFuture(null);
+        AnswerTask savedTask = answerTaskRepository.save(task);
+
+        return CompletableFuture.completedFuture(savedTask);
     }
 }

@@ -5,6 +5,7 @@ import com.blooming.inpeak.answer.dto.command.AnswerCreateAsyncCommand;
 import com.blooming.inpeak.answer.repository.AnswerTaskRepository;
 import com.blooming.inpeak.common.error.exception.NotFoundException;
 import com.blooming.inpeak.question.domain.Question;
+import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +34,7 @@ public class AnswerAsyncService {
         AnswerTask savedTask = answerTaskRepository.save(newTask);
 
         // 비동기 작업 요청
-        answerAsyncProcessor.processAnswerTaskAsync(savedTask);
+        answerAsyncProcessor.handleTaskAsync(savedTask);
 
         return savedTask.getId();
     }
@@ -51,9 +52,9 @@ public class AnswerAsyncService {
 
         // 작업 상태를 대기 상태로 변경
         task.retry();
-        answerTaskRepository.save(task);
+        AnswerTask savedTask = answerTaskRepository.save(task);
 
         // 비동기 작업 요청
-        //kafkaTemplate.send(ANSWER_TASK_TOPIC, new AnswerTaskMessage(task.getId()));
+        answerAsyncProcessor.handleTaskAsync(savedTask);
     }
 }
