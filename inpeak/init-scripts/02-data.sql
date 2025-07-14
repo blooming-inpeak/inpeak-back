@@ -21,15 +21,14 @@ START TRANSACTION;
 -- 1. 회원 데이터
 -- -------------------------------
 INSERT INTO members
-(id, correct_answer_count, created_at, total_question_count, updated_at,
- kakao_id, nickname, provider, registration_status, kakao_email)
+(id, created_at,  updated_at, kakao_id, nickname, provider, registration_status, kakao_email)
 VALUES
-    (1, 0, NOW(), 0, NOW(), 1, "test1", "KAKAO", "COMPLETED", "test1@test.com"),
-    (2, 0, NOW(), 0, NOW(), 2, "test2", "KAKAO", "INITIATED", "test2@test.com"),
-    (3, 0, NOW(), 0, NOW(), 3, "test3", "KAKAO", "COMPLETED", "test3@test.com"),
-    (4, 0, NOW(), 0, NOW(), 4, "test4", "KAKAO", "INITIATED", "test4@test.com"),
-    (5, 0, NOW(), 0, NOW(), 5, "test5", "KAKAO", "COMPLETED", "test5@test.com"),
-    (6, 0, NOW(), 0, NOW(), 6, "test6", "KAKAO", "INITIATED", "test6@test.com");
+    (1, NOW(), NOW(), 1, "test1", "KAKAO", "COMPLETED", "test1@test.com"),
+    (2, NOW(), NOW(), 2, "test2", "KAKAO", "INITIATED", "test2@test.com"),
+    (3, NOW(), NOW(), 3, "test3", "KAKAO", "COMPLETED", "test3@test.com"),
+    (4, NOW(), NOW(), 4, "test4", "KAKAO", "INITIATED", "test4@test.com"),
+    (5, NOW(), NOW(), 5, "test5", "KAKAO", "COMPLETED", "test5@test.com"),
+    (6, NOW(), NOW(), 6, "test6", "KAKAO", "INITIATED", "test6@test.com");
 
 SELECT CONCAT('회원 데이터: ', COUNT(*), '개 행') AS message FROM members;
 

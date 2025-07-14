@@ -75,8 +75,6 @@ class CustomOAuth2UserServiceTest {
             .kakaoId(kakaoId)
             .nickname("기존회원")
             .provider(OAuth2Provider.KAKAO)
-            .totalQuestionCount(0L)
-            .correctAnswerCount(0L)
             .build();
 
         // 테스트 데이터 설정
@@ -145,8 +143,6 @@ class CustomOAuth2UserServiceTest {
             .kakaoId(kakaoId)
             .nickname(generatedNickname)
             .provider(OAuth2Provider.KAKAO)
-            .totalQuestionCount(0L)
-            .correctAnswerCount(0L)
             .kakaoEmail(testEmail)
             .build();
 

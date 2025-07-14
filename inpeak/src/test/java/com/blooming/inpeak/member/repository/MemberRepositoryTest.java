@@ -35,8 +35,6 @@ class MemberRepositoryTest extends IntegrationTestSupport {
             .kakaoId(kakaoId)
             .nickname("테스트유저")
             .provider(OAuth2Provider.KAKAO)
-            .totalQuestionCount(0L)
-            .correctAnswerCount(0L)
             .kakaoEmail(testEmail)
             .build();
         memberRepository.save(member);
@@ -62,8 +60,6 @@ class MemberRepositoryTest extends IntegrationTestSupport {
             .kakaoId(kakaoId)
             .nickname(nickname)
             .provider(OAuth2Provider.KAKAO)
-            .totalQuestionCount(0L)
-            .correctAnswerCount(0L)
             .kakaoEmail(testEmail)
             .build();
         memberRepository.save(member);
