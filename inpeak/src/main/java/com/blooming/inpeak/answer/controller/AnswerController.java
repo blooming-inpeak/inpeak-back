@@ -115,17 +115,6 @@ public class AnswerController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/v2/create")
-    public ResponseEntity<Long> createAnswer(
-        @AuthenticationPrincipal MemberPrincipal memberPrincipal,
-        @RequestBody AnswerCreateRequest request
-    ) {
-        AnswerCreateAsyncCommand command = request.toAsyncCommand(memberPrincipal.id());
-        Long response = answerAsyncService.requestAsyncAnswerCreation(command);
-
-        return ResponseEntity.ok(response);
-    }
-
     @PutMapping("/understood")
     public ResponseEntity<Void> updateUnderstood(
         @RequestBody UnderstoodUpdateRequest request,

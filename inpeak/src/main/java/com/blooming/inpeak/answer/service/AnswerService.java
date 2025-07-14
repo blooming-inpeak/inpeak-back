@@ -2,8 +2,11 @@ package com.blooming.inpeak.answer.service;
 
 import com.blooming.inpeak.answer.domain.Answer;
 import com.blooming.inpeak.answer.domain.AnswerStatus;
+import com.blooming.inpeak.answer.domain.AnswerTask;
+import com.blooming.inpeak.answer.domain.AnswerTaskStatus;
 import com.blooming.inpeak.answer.dto.command.AnswerCreateCommand;
 import com.blooming.inpeak.answer.dto.command.AnswerFilterCommand;
+import com.blooming.inpeak.answer.dto.response.AnswerByTaskResponse;
 import com.blooming.inpeak.answer.dto.response.AnswerDetailResponse;
 import com.blooming.inpeak.answer.dto.response.AnswerIDResponse;
 import com.blooming.inpeak.answer.dto.response.AnswerListResponse;
@@ -14,6 +17,7 @@ import com.blooming.inpeak.answer.dto.response.RecentAnswerListResponse;
 import com.blooming.inpeak.answer.dto.response.RecentAnswerResponse;
 import com.blooming.inpeak.answer.repository.AnswerRepository;
 import com.blooming.inpeak.answer.repository.AnswerRepositoryCustom;
+import com.blooming.inpeak.answer.repository.AnswerTaskRepository;
 import com.blooming.inpeak.common.error.exception.ConflictException;
 import com.blooming.inpeak.common.error.exception.EncodingException;
 import com.blooming.inpeak.common.error.exception.ForbiddenException;
@@ -31,6 +35,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -47,6 +53,8 @@ public class AnswerService {
     private final InterviewRepository interviewRepository;
     private final MemberStatisticsService memberStatisticsService;
     private final AnswerPresignedUrlService answerPresignedUrlService;
+    private final AnswerTaskRepository answerTaskRepository;
+    private final AnswerAsyncProcessor answerAsyncProcessor;
 
     /**
      * 답변을 스킵하는 메서드
@@ -255,5 +263,45 @@ public class AnswerService {
                 "video");
         }
         return new AnswerPresignedUrlResponse(audioURL, videoURL);
+    }
+
+    /**
+     * 특정 질문에 대한 답변을 조회하는 메서드
+     *
+     * @param taskId      작업 ID
+     * @param memberId    사용자 ID
+     * @return 답변 상세 정보
+     */
+    public ResponseEntity<AnswerByTaskResponse> findAnswerByTaskId(Long taskId, Long memberId) {
+        AnswerTask task = answerTaskRepository.findById(taskId)
+            .orElseThrow(() -> new NotFoundException("해당 답변이 존재하지 않습니다."));
+
+        if (!task.getMemberId().equals(memberId)) {
+            throw new ForbiddenException("해당 답변에 대한 접근 권한이 없습니다.");
+        }
+
+        return switch (task.getStatus()) {
+            case WAITING -> ResponseEntity
+                .status(HttpStatus.ACCEPTED)
+                .body(AnswerByTaskResponse.waiting(task.getId()));
+
+            case FAILED -> handleFailedTask(task);
+
+            case SUCCESS -> ResponseEntity.ok(
+                AnswerByTaskResponse.success(task.getId(), task.getAnswerId()));
+        };
+    }
+
+    private ResponseEntity<AnswerByTaskResponse> handleFailedTask(AnswerTask task) {
+        AnswerTask completedTask = answerAsyncProcessor.handleTaskAsync(task).join();
+
+        if (completedTask.getStatus() == AnswerTaskStatus.SUCCESS) {
+            return ResponseEntity.ok(
+                AnswerByTaskResponse.success(completedTask.getId(), completedTask.getAnswerId()));
+        }
+
+        return ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(AnswerByTaskResponse.failed(task.getId()));
     }
 }
