@@ -1,21 +1,9 @@
 package com.blooming.inpeak.answer.controller;
 
 import com.blooming.inpeak.answer.domain.AnswerStatus;
-import com.blooming.inpeak.answer.dto.command.AnswerCreateAsyncCommand;
-import com.blooming.inpeak.answer.dto.command.AnswerCreateCommand;
-import com.blooming.inpeak.answer.dto.command.AnswerFilterCommand;
-import com.blooming.inpeak.answer.dto.request.AnswerCreateRequest;
-import com.blooming.inpeak.answer.dto.request.AnswerSkipRequest;
-import com.blooming.inpeak.answer.dto.request.CommentUpdateRequest;
-import com.blooming.inpeak.answer.dto.request.CorrectAnswerFilterRequest;
-import com.blooming.inpeak.answer.dto.request.IncorrectAnswerFilterRequest;
-import com.blooming.inpeak.answer.dto.request.UnderstoodUpdateRequest;
-import com.blooming.inpeak.answer.dto.response.AnswerDetailResponse;
-import com.blooming.inpeak.answer.dto.response.AnswerIDResponse;
-import com.blooming.inpeak.answer.dto.response.AnswerListResponse;
-import com.blooming.inpeak.answer.dto.response.AnswerPresignedUrlResponse;
-import com.blooming.inpeak.answer.dto.response.InterviewWithAnswersResponse;
-import com.blooming.inpeak.answer.dto.response.RecentAnswerListResponse;
+import com.blooming.inpeak.answer.dto.command.*;
+import com.blooming.inpeak.answer.dto.request.*;
+import com.blooming.inpeak.answer.dto.response.*;
 import com.blooming.inpeak.answer.service.AnswerAsyncService;
 import com.blooming.inpeak.answer.service.AnswerPresignedUrlService;
 import com.blooming.inpeak.answer.service.AnswerService;
@@ -41,8 +29,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class AnswerController {
 
     private final AnswerService answerService;
-    private final AnswerPresignedUrlService answerPresignedUrlService;
-    private final AnswerAsyncService answerAsyncService;
 
     @PostMapping("/skip")
     public ResponseEntity<AnswerIDResponse> skipAnswer(

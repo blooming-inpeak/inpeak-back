@@ -11,10 +11,11 @@ import com.blooming.inpeak.answer.dto.response.InterviewWithAnswersResponse;
 import com.blooming.inpeak.answer.dto.response.RecentAnswerListResponse;
 import com.blooming.inpeak.answer.dto.response.RecentAnswerResponse;
 import com.blooming.inpeak.answer.repository.AnswerRepository;
-import com.blooming.inpeak.answer.repository.AnswerRepositoryCustom;
 import com.blooming.inpeak.common.error.exception.NotFoundException;
 import com.blooming.inpeak.interview.domain.Interview;
 import com.blooming.inpeak.interview.repository.InterviewRepository;
+import com.blooming.inpeak.member.domain.MemberStatistics;
+import com.blooming.inpeak.member.repository.MemberStatisticsRepository;
 import com.blooming.inpeak.question.domain.Question;
 import com.blooming.inpeak.question.domain.QuestionType;
 import com.blooming.inpeak.question.repository.QuestionRepository;
@@ -37,9 +38,6 @@ class AnswerServiceTest extends IntegrationTestSupport {
     private AnswerRepository answerRepository;
 
     @Autowired
-    private AnswerRepositoryCustom answerRepositoryCustom;
-
-    @Autowired
     private QuestionRepository questionRepository;
 
     @Autowired
@@ -47,6 +45,9 @@ class AnswerServiceTest extends IntegrationTestSupport {
 
     @Autowired
     private AnswerService answerService;
+
+    @Autowired
+    private MemberStatisticsRepository memberStatisticsRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -67,18 +68,6 @@ class AnswerServiceTest extends IntegrationTestSupport {
             .isUnderstood(isUnderstood)
             .status(status)
             .build());
-    }
-
-    private Answer createAnswerEntity(Long memberId, Long questionId, Long interviewId, AnswerStatus status) {
-        return Answer.builder()
-            .questionId(questionId)
-            .memberId(memberId)
-            .interviewId(interviewId)
-            .userAnswer("스프링 답변1")
-            .runningTime(120L)
-            .isUnderstood(false)
-            .status(status)
-            .build();
     }
 
     @DisplayName("저장된 데이터를 기반으로 올바른 응답을 반환해야 한다")
@@ -137,6 +126,8 @@ class AnswerServiceTest extends IntegrationTestSupport {
             .getId();
         Question question = questionRepository.save(
             Question.of("자바의 GC 동작 방식", QuestionType.SPRING, "모법 답변"));
+
+        memberStatisticsRepository.save(MemberStatistics.of(memberId));
 
         // when
         answerService.skipAnswer(memberId, question.getId(), interviewId);
