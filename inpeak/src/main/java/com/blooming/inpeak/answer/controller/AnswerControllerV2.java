@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/answer/v2")
+@RequestMapping("/api/v2/answer")
 @RequiredArgsConstructor
 public class AnswerControllerV2 {
 
@@ -50,14 +50,5 @@ public class AnswerControllerV2 {
     ) {
         AnswerDetailResponse response = answerService.getAnswerById(answerId, memberPrincipal.id());
         return ResponseEntity.ok(response);
-    }
-
-    @PostMapping("/tasks/{taskId}/retry")
-    public ResponseEntity<Void> retryAnswerTask(
-        @AuthenticationPrincipal MemberPrincipal memberPrincipal,
-        @PathVariable Long taskId
-    ) {
-        answerAsyncService.retryAnswerTask(taskId, memberPrincipal.id());
-        return ResponseEntity.ok().build();
     }
 }

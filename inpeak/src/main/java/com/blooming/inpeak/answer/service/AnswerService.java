@@ -1,23 +1,9 @@
 package com.blooming.inpeak.answer.service;
 
-import com.blooming.inpeak.answer.domain.Answer;
-import com.blooming.inpeak.answer.domain.AnswerStatus;
-import com.blooming.inpeak.answer.domain.AnswerTask;
-import com.blooming.inpeak.answer.domain.AnswerTaskStatus;
-import com.blooming.inpeak.answer.dto.command.AnswerCreateCommand;
-import com.blooming.inpeak.answer.dto.command.AnswerFilterCommand;
-import com.blooming.inpeak.answer.dto.response.AnswerByTaskResponse;
-import com.blooming.inpeak.answer.dto.response.AnswerDetailResponse;
-import com.blooming.inpeak.answer.dto.response.AnswerIDResponse;
-import com.blooming.inpeak.answer.dto.response.AnswerListResponse;
-import com.blooming.inpeak.answer.dto.response.AnswerPresignedUrlResponse;
-import com.blooming.inpeak.answer.dto.response.AnswerResponse;
-import com.blooming.inpeak.answer.dto.response.InterviewWithAnswersResponse;
-import com.blooming.inpeak.answer.dto.response.RecentAnswerListResponse;
-import com.blooming.inpeak.answer.dto.response.RecentAnswerResponse;
-import com.blooming.inpeak.answer.repository.AnswerRepository;
-import com.blooming.inpeak.answer.repository.AnswerRepositoryCustom;
-import com.blooming.inpeak.answer.repository.AnswerTaskRepository;
+import com.blooming.inpeak.answer.domain.*;
+import com.blooming.inpeak.answer.dto.command.*;
+import com.blooming.inpeak.answer.dto.response.*;
+import com.blooming.inpeak.answer.repository.*;
 import com.blooming.inpeak.common.error.exception.ConflictException;
 import com.blooming.inpeak.common.error.exception.EncodingException;
 import com.blooming.inpeak.common.error.exception.ForbiddenException;
@@ -71,6 +57,9 @@ public class AnswerService {
 
         Answer skippedAnswer = Answer.ofSkipped(memberId, questionId, interviewId);
         answerRepository.save(skippedAnswer);
+
+        // 회원 통계 업데이트
+        memberStatisticsService.updateStatistics(memberId, skippedAnswer.getStatus());
 
         return new AnswerIDResponse(skippedAnswer.getId());
     }
