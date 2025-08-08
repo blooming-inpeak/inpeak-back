@@ -21,7 +21,10 @@ public enum ErrorCode {
     CONFLICT("CONFLICT", "요청이 서버 상태와 충돌했습니다.", 409),
 
     // 500 Internal Server Error
-    ENCODING_FAILED("ENCODING_FAILED", "인코딩에 실패했습니다.", 500);
+    ENCODING_FAILED("ENCODING_FAILED", "인코딩에 실패했습니다.", 500),
+
+    // 204 No Content
+    NO_CONTENT("NO_CONTENT", "요청은 성공했지만 반환할 데이터가 없습니다.", 204);
 
     private final String code;
     private final String message;

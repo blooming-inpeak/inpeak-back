@@ -79,4 +79,11 @@ public class ErrorHandlingController {
         log.error("오디오 파일 인코딩 중 오류 발생: {}", e.getMessage());
         return buildError(ErrorCode.ENCODING_FAILED); // 혹은 적절한 에러 코드
     }
+
+    @ExceptionHandler(NoContentException.class)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    protected ErrorResponse handleNoContentException(NoContentException e) {
+        log.info("요청은 성공했지만 반환할 데이터가 없습니다: {}", e.getMessage());
+        return buildError(ErrorCode.NO_CONTENT);
+    }
 }

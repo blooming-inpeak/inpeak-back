@@ -7,6 +7,7 @@ import com.blooming.inpeak.answer.repository.*;
 import com.blooming.inpeak.common.error.exception.ConflictException;
 import com.blooming.inpeak.common.error.exception.EncodingException;
 import com.blooming.inpeak.common.error.exception.ForbiddenException;
+import com.blooming.inpeak.common.error.exception.NoContentException;
 import com.blooming.inpeak.common.error.exception.NotFoundException;
 import com.blooming.inpeak.interview.domain.Interview;
 import com.blooming.inpeak.interview.repository.InterviewRepository;
@@ -96,15 +97,15 @@ public class AnswerService {
         List<Answer> answers = answerRepository.findAnswersByMemberAndDate(memberId, date);
 
         if (answers.isEmpty()) {
-            // 🔍 인터뷰는 존재하지만 답변이 없는 케이스 확인을 위해 인터뷰만 따로 조회
+            // 인터뷰는 존재하지만 답변이 없는 케이스 확인을 위해 인터뷰만 따로 조회
             Interview interview = interviewRepository.findByMemberIdAndStartDate(memberId, date)
-                .orElseThrow(() -> new NotFoundException("해당 날짜에 진행된 인터뷰가 없습니다."));
+                .orElseThrow(() -> new NoContentException("해당 날짜에 진행된 인터뷰가 없습니다."));
 
-            // 🔴 인터뷰는 있지만 답변이 없음
+            // 인터뷰는 있지만 답변이 없음
             throw new ConflictException("해당 인터뷰에 대한 답변이 존재하지 않습니다.");
         }
 
-        // ✅ 인터뷰도 있고, 답변도 있음
+        // 인터뷰도 있고, 답변도 있음
         Interview interview = answers.get(0).getInterview(); // answer가 있으므로 get(0) 안전
         return InterviewWithAnswersResponse.from(interview, answers);
     }
