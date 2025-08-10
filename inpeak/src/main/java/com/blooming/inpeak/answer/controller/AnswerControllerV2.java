@@ -25,7 +25,6 @@ public class AnswerControllerV2 {
     private final AnswerService answerService;
     private final AnswerAsyncService answerAsyncService;
 
-    // TODO: ECR cicd를 위한 주석 추가
     @PostMapping("/create")
     public ResponseEntity<Long> createAnswer(
         @AuthenticationPrincipal MemberPrincipal memberPrincipal,
