@@ -6,7 +6,6 @@ WORKDIR /app
 # Copy gradle files and wrapper first for better caching
 COPY gradle/ gradle/
 COPY gradlew ./
-COPY gradle.properties ./
 COPY build.gradle ./
 COPY settings.gradle ./
 
