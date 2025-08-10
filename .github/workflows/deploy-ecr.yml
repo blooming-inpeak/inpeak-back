@@ -25,11 +25,11 @@ jobs:
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4
       with:
-        build-root-directory: inpeak-back/inpeak
+        build-root-directory: inpeak
         
 #    - name: Run tests
 #      run: |
-#        cd inpeak-back/inpeak
+#        cd inpeak
 #        ./gradlew test
 
     - name: Configure AWS credentials
@@ -49,7 +49,7 @@ jobs:
         IMAGE_TAG: ${{ github.sha }}
       run: |
         # Build Docker image from the correct directory
-        cd inpeak-back/inpeak
+        cd inpeak
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
         
