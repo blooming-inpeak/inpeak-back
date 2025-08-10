@@ -1,13 +1,11 @@
 package com.blooming.inpeak.interview.controller;
 
 import com.blooming.inpeak.interview.dto.response.CalendarListResponse;
-import com.blooming.inpeak.interview.dto.response.CalendarResponse;
 import com.blooming.inpeak.interview.dto.response.InterviewStartResponse;
 import com.blooming.inpeak.interview.service.InterviewService;
 import com.blooming.inpeak.interview.service.InterviewStartService;
 import com.blooming.inpeak.member.dto.MemberPrincipal;
 import java.time.LocalDate;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
