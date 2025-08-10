@@ -33,10 +33,12 @@ jobs:
           ${{ runner.os }}-gradle-
 
     - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-
+      run: chmod +x inpeak-back/inpeak/gradlew
+      
     - name: Run tests
-      run: ./gradlew test
+      run: |
+        cd inpeak-back/inpeak
+        ./gradlew test
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
@@ -54,7 +56,8 @@ jobs:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        # Build Docker image
+        # Build Docker image from the correct directory
+        cd inpeak-back/inpeak
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
         
