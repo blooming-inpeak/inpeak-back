@@ -103,7 +103,7 @@ jobs:
           DEPLOYMENT_ID=$(aws deploy create-deployment \
             --application-name $CODE_DEPLOY_APPLICATION_NAME \
             --deployment-group-name $CODE_DEPLOY_DEPLOYMENT_GROUP_NAME \
-            --deployment-config-name CodeDeployDefault.AllAtOnceDeployment \
+            --deployment-config-name CodeDeployDefault.AllAtOnce \
             --s3-location bucket=$S3_BUCKET_NAME,key=deploy.zip,bundleType=zip \
             --query 'deploymentId' \
             --output text)
