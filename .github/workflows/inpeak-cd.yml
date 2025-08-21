@@ -1,0 +1,128 @@
+name: Inpeak CD
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  AWS_REGION: ap-northeast-2
+  S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+  CODE_DEPLOY_APPLICATION_NAME: ${{ secrets.CODE_DEPLOY_APPLICATION_NAME }}
+  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: ${{ secrets.CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./inpeak
+
+    steps:
+      - name: Github Checkout
+        uses: actions/checkout@v4
+
+      - name: JDK 21 구성
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+          cache: 'gradle'
+
+      - name: OAuth 설정 파일 생성
+        run: |
+          mkdir -p ./src/main/resources
+          echo "${{ secrets.APPLICATION_OAUTH_YML }}" > ./src/main/resources/application-oauth.yml
+
+      - name: AWS 설정 파일 생성
+        run: |
+          mkdir -p ./src/main/resources
+          echo "${{ secrets.APPLICATION_AWS_YML }}" > ./src/main/resources/application-aws.yml
+
+      - name: OpenAI 설정 파일 생성
+        run: |
+          mkdir -p ./src/main/resources
+          echo "${{ secrets.APPLICATION_OPENAI_YML }}" > ./src/main/resources/application-openai.yml
+
+      - name: Gradlew Wrapper 실행 권한 부여
+        run: chmod +x gradlew
+
+      - name: Gradle 캐싱
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Gradle 빌드 (테스트 제외)
+        run: ./gradlew clean build -x test
+
+      - name: AWS 자격 증명 구성
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: 배포 파일 준비
+        run: |
+          mkdir -p deploy
+          
+          # JAR 파일 복사
+          cp build/libs/inpeak-backend.jar deploy/
+          
+          # 설정 파일들 복사
+          cp appspec.yml deploy/
+          cp -r scripts deploy/
+          
+          # 스크립트 파일 실행권한 설정 (중요!)
+          chmod +x deploy/scripts/*.sh
+          
+          # 배포 패키지 구조 확인
+          echo "배포 패키지 구조:"
+          find deploy -type f -ls
+
+      - name: 배포 파일 압축
+        run: |
+          cd deploy
+          zip -r ../deploy.zip .
+          cd ..
+          echo "압축 파일 크기: $(du -h deploy.zip)"
+
+      - name: S3에 배포 파일 업로드
+        run: |
+          aws s3 cp deploy.zip s3://$S3_BUCKET_NAME/deploy.zip
+          echo "S3 업로드 완료: s3://$S3_BUCKET_NAME/deploy.zip"
+
+      - name: CodeDeploy 배포 실행
+        id: deploy
+        run: |
+          DEPLOYMENT_ID=$(aws deploy create-deployment \
+            --application-name $CODE_DEPLOY_APPLICATION_NAME \
+            --deployment-group-name $CODE_DEPLOY_DEPLOYMENT_GROUP_NAME \
+            --deployment-config-name CodeDeployDefault.AllAtOnceDeployment \
+            --s3-location bucket=$S3_BUCKET_NAME,key=deploy.zip,bundleType=zip \
+            --query 'deploymentId' \
+            --output text)
+          
+          echo "DEPLOYMENT_ID=$DEPLOYMENT_ID" >> $GITHUB_OUTPUT
+          echo "배포 시작됨. Deployment ID: $DEPLOYMENT_ID"
+
+      - name: 배포 상태 확인
+        run: |
+          DEPLOYMENT_ID="${{ steps.deploy.outputs.DEPLOYMENT_ID }}"
+          echo "배포 상태 모니터링 중... (Deployment ID: $DEPLOYMENT_ID)"
+          
+          # 배포 완료까지 대기 (최대 10분)
+          aws deploy wait deployment-successful --deployment-id $DEPLOYMENT_ID
+
+      - name: 배포 완료 알림
+        run: |
+          echo "### 🎉 배포 완료" >> $GITHUB_STEP_SUMMARY
+          echo "- **브랜치**: main" >> $GITHUB_STEP_SUMMARY
+          echo "- **배포 시간**: $(date)" >> $GITHUB_STEP_SUMMARY
+          echo "- **S3 버킷**: $S3_BUCKET_NAME" >> $GITHUB_STEP_SUMMARY
+          echo "- **Deployment ID**: ${{ steps.deploy.outputs.DEPLOYMENT_ID }}" >> $GITHUB_STEP_SUMMARY
