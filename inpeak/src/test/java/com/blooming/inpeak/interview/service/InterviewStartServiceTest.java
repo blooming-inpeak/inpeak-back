@@ -67,16 +67,17 @@ class InterviewStartServiceTest extends IntegrationTestSupport {
         assertThat(questionIds).contains(q1.getId(), q2.getId(), q3.getId());
     }
 
-    @Test
-    @DisplayName("남은 모의면접 횟수가 0이면 예외가 발생해야 한다.")
-    void startInterview_Fail_WhenNoRemainingInterviews() {
-        // given
-        interviewRepository.save(Interview.of(MEMBER_ID, TODAY));
-
-        // when & then
-        assertThatThrownBy(() ->
-            interviewStartService.startInterview(MEMBER_ID, TODAY)
-        ).isInstanceOf(BadRequestException.class)
-            .hasMessageContaining("모의면접 횟수가 모두 소진되었습니다.");
-    }
+    //TODO: [Beta] 인터뷰 횟수 관련 테스트 다시 활성화하기
+//    @Test
+//    @DisplayName("남은 모의면접 횟수가 0이면 예외가 발생해야 한다.")
+//    void startInterview_Fail_WhenNoRemainingInterviews() {
+//        // given
+//        interviewRepository.save(Interview.of(MEMBER_ID, TODAY));
+//
+//        // when & then
+//        assertThatThrownBy(() ->
+//            interviewStartService.startInterview(MEMBER_ID, TODAY)
+//        ).isInstanceOf(BadRequestException.class)
+//            .hasMessageContaining("모의면접 횟수가 모두 소진되었습니다.");
+//    }
 }
