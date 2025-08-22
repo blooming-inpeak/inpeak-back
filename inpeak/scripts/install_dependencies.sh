@@ -19,7 +19,12 @@ if ! java -version 2>&1 | grep -q "21"; then
 
     # JAVA_HOME 설정
     echo 'export JAVA_HOME=/usr/lib/jvm/java-21-amazon-corretto' >> /etc/environment
-    echo 'export PATH=$JAVA_HOME/bin:$PATH' >> /etc/environment
+    
+    # PATH에 Java 경로 추가 (기존 PATH 보존)
+    if ! grep -q "JAVA_HOME/bin" /etc/environment; then
+        sed -i '/^PATH=/d' /etc/environment
+        echo 'PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/jvm/java-21-amazon-corretto/bin"' >> /etc/environment
+    fi
 
     # 현재 세션에서도 적용
     export JAVA_HOME=/usr/lib/jvm/java-21-amazon-corretto
@@ -33,7 +38,12 @@ else
         echo "JAVA_HOME 환경변수 설정..."
         export JAVA_HOME=/usr/lib/jvm/java-21-amazon-corretto
         echo 'export JAVA_HOME=/usr/lib/jvm/java-21-amazon-corretto' >> /etc/environment
-        echo 'export PATH=$JAVA_HOME/bin:$PATH' >> /etc/environment
+        
+        # PATH에 Java 경로 추가 (기존 PATH 보존)
+        if ! grep -q "JAVA_HOME/bin" /etc/environment; then
+            sed -i '/^PATH=/d' /etc/environment
+            echo 'PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/jvm/java-21-amazon-corretto/bin"' >> /etc/environment
+        fi
     fi
 fi
 
