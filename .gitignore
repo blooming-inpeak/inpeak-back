@@ -49,4 +49,4 @@ out/
 .vscode/
 
 ### Claude ###
-inpeak/.claude/*
+**/.claude/*
