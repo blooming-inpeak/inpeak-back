@@ -50,3 +50,6 @@ out/
 
 ### Claude ###
 **/.claude/*
+
+### Production Config ###
+**/application-prod.yml
