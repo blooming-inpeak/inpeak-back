@@ -25,8 +25,8 @@ public class InterviewService {
      * @return 모의면접 잔여 횟수
      */
     public RemainingInterviewsResponse getRemainingInterviews(Long memberId, LocalDate today) {
-        boolean exists = interviewRepository.existsByMemberIdAndStartDate(memberId, today);
-        return RemainingInterviewsResponse.of(exists ? 0 : 1);
+        // boolean exists = interviewRepository.existsByMemberIdAndStartDate(memberId, today);
+        return RemainingInterviewsResponse.of(999);
     }
 
     /**

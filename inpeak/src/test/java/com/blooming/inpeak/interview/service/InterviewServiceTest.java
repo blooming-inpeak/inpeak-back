@@ -26,34 +26,35 @@ class InterviewServiceTest extends IntegrationTestSupport {
 
     private static final Long MEMBER_ID = 1L;
 
-    @Test
-    @Transactional
-    @DisplayName("회원이 오늘 인터뷰를 진행하지 않았다면 남은 인터뷰 횟수는 1이어야 한다.")
-    void getRemainingInterviews_ShouldReturnOneIfNoInterviewToday() {
-        // given
-        LocalDate today = LocalDate.now();
-
-        // when
-        RemainingInterviewsResponse response = interviewService.getRemainingInterviews(MEMBER_ID, today);
-
-        // then
-        assertThat(response.count()).isEqualTo(1);
-    }
-
-    @Test
-    @Transactional
-    @DisplayName("회원이 오늘 인터뷰를 이미 진행했다면 남은 인터뷰 횟수는 0이어야 한다.")
-    void getRemainingInterviews_ShouldReturnZeroIfInterviewToday() {
-        // given
-        LocalDate today = LocalDate.now();
-        interviewRepository.save(Interview.of(MEMBER_ID, today));
-
-        // when
-        RemainingInterviewsResponse response = interviewService.getRemainingInterviews(MEMBER_ID, today);
-
-        // then
-        assertThat(response.count()).isEqualTo(0);
-    }
+    //TODO: [Beta] 인터뷰 횟수 관련 테스트 다시 활성화하기
+//    @Test
+//    @Transactional
+//    @DisplayName("회원이 오늘 인터뷰를 진행하지 않았다면 남은 인터뷰 횟수는 1이어야 한다.")
+//    void getRemainingInterviews_ShouldReturnOneIfNoInterviewToday() {
+//        // given
+//        LocalDate today = LocalDate.now();
+//
+//        // when
+//        RemainingInterviewsResponse response = interviewService.getRemainingInterviews(MEMBER_ID, today);
+//
+//        // then
+//        assertThat(response.count()).isEqualTo(1);
+//    }
+//
+//    @Test
+//    @Transactional
+//    @DisplayName("회원이 오늘 인터뷰를 이미 진행했다면 남은 인터뷰 횟수는 0이어야 한다.")
+//    void getRemainingInterviews_ShouldReturnZeroIfInterviewToday() {
+//        // given
+//        LocalDate today = LocalDate.now();
+//        interviewRepository.save(Interview.of(MEMBER_ID, today));
+//
+//        // when
+//        RemainingInterviewsResponse response = interviewService.getRemainingInterviews(MEMBER_ID, today);
+//
+//        // then
+//        assertThat(response.count()).isEqualTo(0);
+//    }
 
     @Test
     @Transactional
