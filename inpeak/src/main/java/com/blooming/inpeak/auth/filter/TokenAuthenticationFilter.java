@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -55,9 +56,9 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(
-        HttpServletRequest request,
-        HttpServletResponse response,
-        FilterChain filterChain
+        @NonNull HttpServletRequest request,
+        @NonNull HttpServletResponse response,
+        @NonNull FilterChain filterChain
     ) throws IOException, ServletException {
         try {
             String accessToken = extractAndValidateAccessToken(request, response);
@@ -88,9 +89,9 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     ) throws IOException {
         String accessToken = tokenExtractor.extractAccessToken(request);
 
-        // 액세스 토큰 없음
+        // 로그인 되지 않은 사용자 (액세스 토큰 없음)
         if (accessToken == null) {
-            sendErrorResponse(response, "액세스 토큰이 없습니다");
+            sendNoTokenResponse(response, "로그인이 필요합니다");
             return null;
         }
 
@@ -221,6 +222,17 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
     }
 
+    /**
+     * 토큰이 없을 때 200 응답 (브라우저 콘솔 에러 방지)
+     */
+    private void sendNoTokenResponse(HttpServletResponse response, String message) throws IOException {
+        response.setStatus(HttpStatus.OK.value()); // 200 응답
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write("{\"ok\":false,\"statusCode\":\"UNAUTHORIZED\",\"message\":\"" + message + "\"}");
+        log.info("로그인 필요: {}", message);
+    }
+
     private void sendErrorResponse(HttpServletResponse response, String message) throws IOException {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
@@ -233,7 +245,10 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         response.setStatus(488);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
-        response.getWriter().write("{\"message\":\"가입이 완료되지 않은 사용자입니다\"}");
+        String jsonResponse =
+            "{\"ok\":false,\"statusCode\":\"REGISTRATION_INCOMPLETE\",\"message\":\"회원가입을 완료해주세요\"}";
+        response.getWriter().write(jsonResponse);
+
         log.error("가입 미완료 사용자 차단");
     }
 }
